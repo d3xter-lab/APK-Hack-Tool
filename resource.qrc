@@ -1,0 +1,15 @@
+<RCC>
+  <qresource prefix="logo">
+    <file>img/logo.png</file>
+  </qresource>
+  <qresource prefix="icon">
+    <file>img/android_decompile.png</file>
+    <file>img/android_install_aab.png</file>
+    <file>img/android_install_apk.png</file>
+    <file>img/android_sign.png</file>
+    <file>img/android_zip.png</file>
+    <file>img/android.png</file>
+    <file>img/google-play-store.png</file>
+    <file>img/apk-combo.png</file>
+  </qresource>
+</RCC>
