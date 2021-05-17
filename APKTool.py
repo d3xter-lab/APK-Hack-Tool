@@ -12,6 +12,7 @@ import webbrowser
 import zipfile
 import jks
 import re
+import traceback
 
 frm = uic.loadUiType("APKTool.ui")[0]
 
@@ -60,6 +61,7 @@ class MainWindow(QMainWindow, frm):
         self.btnCompile.clicked.connect(lambda: self.procCompile.start(self.compileCommand))
         self.btnZipalign.clicked.connect(lambda: self.procZipalign.start(self.zipalignCommand))
         self.btnSign.clicked.connect(lambda: self.procSign.start(self.signCommand))
+        self.btnInsApk.clicked.connect(self.installApkToDevice)
         self.btnKeyChange.clicked.connect(self.getKeystoreInfo)
         self.listAppPermissions.itemDoubleClicked.connect(self.checkPermissionInfo)
         self.clickable(self.iconPlayStore).connect(lambda: self.selectAppDownload(1))
@@ -91,6 +93,9 @@ class MainWindow(QMainWindow, frm):
         Util.startAdbServer()
         self.procAdb.start('adb devices -l')
 
+        self.procCmd = QProcess()
+        self.procCmd.setProcessChannelMode(QProcess.MergedChannels)
+
         self.procApktool = QProcess()
         self.procApktool.setProcessChannelMode(QProcess.MergedChannels)
         self.procApktool.readyRead.connect(self.checkApktoolVersion)
@@ -120,6 +125,11 @@ class MainWindow(QMainWindow, frm):
         self.procSign.started.connect(self.signStart)
         self.procSign.finished.connect(self.signEnd)
 
+        self.procInstallApk = QProcess()
+        self.procInstallApk.setProcessChannelMode(QProcess.MergedChannels)
+        self.procInstallApk.started.connect(self.installApkStart)
+        self.procInstallApk.finished.connect(self.installApkEnd)
+
         self.procBaksmali = QProcess()
         self.procBaksmali.setProcessChannelMode(QProcess.MergedChannels)
         self.procBaksmali.started.connect(lambda: self.statusBar.showMessage("Baksmaling.."))
@@ -134,7 +144,6 @@ class MainWindow(QMainWindow, frm):
         self.procFW.setProcessChannelMode(QProcess.MergedChannels)
         self.procFW.started.connect(lambda: self.statusBar.showMessage("Frameworks installing.."))
         self.procFW.finished.connect(lambda: self.statusBar.showMessage("Frameworks install end", 3000))
-
 
     def clickable(self, widget):
         class Filter(QObject):
@@ -443,8 +452,12 @@ class MainWindow(QMainWindow, frm):
         elif self.mode == 4:
             result = str(self.procSign.readAll().data(), encoding='utf-8').strip()
 
-        self.textLog.append(result)
-        self.textLog.moveCursor(QTextCursor.End)
+        try:
+            self.textLog.append(result)
+            self.textLog.moveCursor(QTextCursor.End)
+        except:
+            #print(traceback.format_exc())
+            pass
 
     def decompileStart(self):
         self.statusBar.showMessage("Decompiling..")
@@ -472,6 +485,7 @@ class MainWindow(QMainWindow, frm):
 
         if self.z_op1.isChecked():
             self.procZipalign.start(self.zipalignCommand)
+            self.procZipalign.waitForFinished()
 
         if self.s_op1.isChecked():
             self.procSign.start(self.signCommand)
@@ -501,6 +515,26 @@ class MainWindow(QMainWindow, frm):
         self.changeBtnStatus()
         os.remove(self.texCompOutputPath.text() + self.textCompName.text() + '_temp')
         os.remove(self.texCompOutputPath.text() + self.textCompName.text() + self.appExtension + '.idsig')
+
+    def installApkToDevice(self):
+        if self.a_op1.isChecked():
+            installCmd = 'adb -s ' + self.devicesList.currentText() + ' install -r "' + self.texCompOutputPath.text() + self.textCompName.text() + self.appExtension + '"'
+        else:
+            installCmd = 'adb -s ' + self.devicesList.currentText() + ' install "' + self.texCompOutputPath.text() + self.textCompName.text() + self.appExtension + '"'
+
+        if self.a_op2.isChecked():
+            self.procCmd.start('adb shell pm uninstall -k --user 0 ' + self.labelPackageName.text())
+            self.procCmd.waitForFinished()
+
+        self.procInstallApk.start(installCmd)
+
+    def installApkStart(self):
+        self.statusBar.showMessage("APK installing..")
+        self.changeBtnStatus()
+
+    def installApkEnd(self):
+        self.statusBar.showMessage("APK install end", 3000)
+        self.changeBtnStatus()
 
 
 

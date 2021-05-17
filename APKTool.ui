@@ -829,7 +829,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -1451,6 +1451,53 @@
          </property>
          <property name="echoMode">
           <enum>QLineEdit::Password</enum>
+         </property>
+        </widget>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>ADB</string>
+       </attribute>
+       <widget class="QGroupBox" name="groupBox_13">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>721</width>
+          <height>261</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>ADB Options</string>
+        </property>
+        <widget class="QCheckBox" name="a_op1">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>331</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Replace existing application</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="a_op2">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>60</y>
+           <width>331</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Remove exisiting app before install yours</string>
          </property>
         </widget>
        </widget>
